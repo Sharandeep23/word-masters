@@ -1,0 +1,55 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+header {
+    border-bottom: 2px solid #333;
+    text-align: center;
+}
+
+header h1{
+    font-family: "Madimi One", sans-serif;
+    font-weight: 400;
+    font-size: 3rem;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spiral-container{
+    text-align: center;
+}
+
+.spiral {
+    font-size: 3rem;
+    animation: spin 1.5s linear infinite;
+}
+
+/* Utility Classes */
+.hidden {
+   /* visibility: hidden; */
+}
+
+.letter-boxes {
+
+}
+
+.letter-box {
+    height: 3rem;
+    width: 3rem;
+    font-size: 2.5rem;
+    text-transform: uppercase;
+    border: 3px solid #ccc;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
