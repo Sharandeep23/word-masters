@@ -16,7 +16,7 @@ header {
 header h1 {
     font-family: "Madimi One", sans-serif;
     font-weight: 400;
-    font-size: 3rem;
+    font-size: 3.5rem;
 }
 
 @keyframes spin {
@@ -49,7 +49,6 @@ header h1 {
 
 .letter-box {
     font-size: 3.5rem;
-    text-transform: uppercase;
     border: 3px solid #ccc;
     font-weight: bold;
     display: flex;
