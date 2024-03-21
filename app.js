@@ -1,11 +1,14 @@
 const letterBoxes = document.querySelectorAll('.letter-box');
 const spiral = document.querySelector('.spiral-container');
+const h1 = document.querySelector('header h1');
 
 const ANSWER_LENGTH = 5;
 let currentRow = 0;
 let guessLetterArr = [];
+let guessWord;
 let isValidWord;
 let wordOfTheDay;
+let wordLetterArr = [];
 
 async function init() {
   // Getting wordOfTheDay
@@ -13,12 +16,12 @@ async function init() {
     const response = await axios.get(
       'https://words.dev-apis.com/word-of-the-day'
     );
-    wordOfTheDay = response.data.word;
+    wordOfTheDay = response.data.word.toUpperCase();
   } catch (error) {
     console.error(error);
   }
   // Hiding the Loading spiral as wordOfTheDay is received
-  spiral.classList.add('hidden');
+  hideLoadingSpiral(true);
 
   // Even listener for the entire document
   document.addEventListener('keydown', handleKeyPress);
@@ -41,6 +44,8 @@ function handleKeyPress(e) {
 }
 
 function handleLetter(letter) {
+  // currentRow shouldn't be higher than 5
+  if (currentRow > 5) return;
   if (guessLetterArr.length < ANSWER_LENGTH) {
     // Add letter to the end
     guessLetterArr.push(letter);
@@ -60,39 +65,93 @@ async function handleEnter() {
   // Guess word should be 5 characters long
   if (guessLetterArr.length !== ANSWER_LENGTH) return;
 
-  const guessWord = guessLetterArr.join('');
+  guessWord = guessLetterArr.join('');
+  wordLetterArr = wordOfTheDay.split('');
 
   // Showing the Loading spiral as validating will take a while
-  spiral.classList.remove('hidden');
-
+  hideLoadingSpiral(false);
   try {
     const response = await axios.post(
       'https://words.dev-apis.com/validate-word',
-      JSON.stringify({
+      {
         word: guessWord,
-      })
+      }
     );
     isValidWord = response.data.validWord;
   } catch (error) {
     console.error(error);
   }
   // Hiding the Loading spiral as validating is finished
-  spiral.classList.add('hidden');
+  hideLoadingSpiral(true);
 
   if (isValidWord) {
-
-    // correct
-    
-    // close
-
-    // wrong
-
-
-    // new row initiating and guessLetterArr is being reset
-    currentRow++;
-    guessLetterArr = [];
+    handleValid();
   } else {
     handleInvalid();
+  }
+}
+function handleValid() {
+  // correct
+  if (wordOfTheDay === guessWord) {
+    handleCorrect();
+    return;
+  }
+
+  // partial correct and close
+  for (let i = 0; i < ANSWER_LENGTH; i++) {
+    // correct
+    if (wordLetterArr[i] === guessLetterArr[i]) {
+      letterBoxes[ANSWER_LENGTH * currentRow + i].classList.add('correct');
+      // Making wordLetterArr && guessLetterArr index's value disable
+      wordLetterArr[i] = null;
+      guessLetterArr[i] = null;
+    } // Close
+    else if (guessLetterArr.includes(wordLetterArr[i])) {
+      // As guessLetterArr and letterBoxes talk to each other
+      // getting guessLetterArr index to use that on letterBoxes
+      const index = guessLetterArr.indexOf(wordLetterArr[i]);
+      letterBoxes[ANSWER_LENGTH * currentRow + index].classList.add('close');
+      // Making wordLetterArr && guessLetterArr index's value disable
+      guessLetterArr[index] = null;
+      wordLetterArr[i] = null;
+    }
+  }
+  // wrong
+  for (let i = 0; i < ANSWER_LENGTH; i++) {
+    // Ignore the null(s) in guessLetterArr
+    // because null(s) are already marked
+    if (!wordLetterArr.includes(guessLetterArr[i]) && guessLetterArr[i]) {
+      letterBoxes[ANSWER_LENGTH * currentRow + i].classList.add('wrong');
+    }
+  }
+
+  console.log(guessLetterArr);
+  console.log(wordLetterArr);
+
+  // new row initiating and guessLetterArr is being reset
+  currentRow++;
+  guessLetterArr = [];
+}
+
+function handleCorrect() {
+  // Adding winner class to the header
+  h1.classList.add('winner');
+  // Adding colors to the boxes in the row
+  for (let i = 0; i < ANSWER_LENGTH; i++) {
+    letterBoxes[ANSWER_LENGTH * currentRow + i].classList.add('correct');
+  }
+  // Removing Event Listener
+  document.removeEventListener('keydown', handleKeyPress);
+}
+
+function handleInvalid() {
+  for (let i = 0; i < ANSWER_LENGTH; i++) {
+    letterBoxes[ANSWER_LENGTH * currentRow + i].classList.add('invalid');
+
+    // Removing 'invalid' class after 1s
+    setTimeout(function () {
+      letterBoxes[ANSWER_LENGTH * currentRow + i].classList.remove('invalid');
+    }, 1000);
   }
 }
 
@@ -104,23 +163,12 @@ function handleBackspace() {
   }
 }
 
-function handleInvalid() {
-  for (
-    let i = ANSWER_LENGTH * currentRow + 0;
-    i < ANSWER_LENGTH * currentRow + guessLetterArr.length;
-    i++
-  ) {
-    letterBoxes[i].classList.add('invalid');
-
-    // Removing 'invalid' class after 1s
-    setTimeout(function () {
-      letterBoxes[i].classList.remove('invalid');
-    }, 1000);
-  }
-}
-
 function isLetter(letter) {
   return /^[a-zA-Z]$/.test(letter);
+}
+
+function hideLoadingSpiral(bool) {
+  spiral.classList.toggle('hidden', bool);
 }
 
 init();

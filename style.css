@@ -77,6 +77,8 @@ header h1 {
     color: white;
 }
 
+
+
 /* flashes red border and then fades back to gray */
 @keyframes flash {
     5% {
