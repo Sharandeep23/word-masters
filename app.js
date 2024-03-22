@@ -17,6 +17,7 @@ async function init() {
       'https://words.dev-apis.com/word-of-the-day'
     );
     wordOfTheDay = response.data.word.toUpperCase();
+    wordLetterArr = wordOfTheDay.split('');
   } catch (error) {
     console.error(error);
   }
@@ -39,8 +40,6 @@ function handleKeyPress(e) {
   } else {
     // do nothing
   }
-
-  console.log(`You pressed ${action}`);
 }
 
 function handleLetter(letter) {
@@ -66,7 +65,6 @@ async function handleEnter() {
   if (guessLetterArr.length !== ANSWER_LENGTH) return;
 
   guessWord = guessLetterArr.join('');
-  wordLetterArr = wordOfTheDay.split('');
 
   // Showing the Loading spiral as validating will take a while
   hideLoadingSpiral(false);
@@ -91,49 +89,46 @@ async function handleEnter() {
   }
 }
 function handleValid() {
+  // Mapping for wordLetterArr to keep track of the letters
+  const wordLetterMap = makeMap(wordLetterArr);
+
   // correct
   if (wordOfTheDay === guessWord) {
     handleCorrect();
     return;
   }
 
-  // partial correct and close
+  // partial correct
   for (let i = 0; i < ANSWER_LENGTH; i++) {
     // correct
     if (wordLetterArr[i] === guessLetterArr[i]) {
       letterBoxes[ANSWER_LENGTH * currentRow + i].classList.add('correct');
-      // Making wordLetterArr && guessLetterArr index's value disable
-      wordLetterArr[i] = null;
-      guessLetterArr[i] = null;
-    } // Close
-    else if (guessLetterArr.includes(wordLetterArr[i])) {
-      // As guessLetterArr and letterBoxes talk to each other
-      // getting guessLetterArr index to use that on letterBoxes
-      const index = guessLetterArr.indexOf(wordLetterArr[i]);
-      letterBoxes[ANSWER_LENGTH * currentRow + index].classList.add('close');
-      // Making wordLetterArr && guessLetterArr index's value disable
-      guessLetterArr[index] = null;
-      wordLetterArr[i] = null;
+      wordLetterMap[guessLetterArr[i]]--;
     }
   }
-  // wrong
+  // Close and wrong
   for (let i = 0; i < ANSWER_LENGTH; i++) {
-    // Ignore the null(s) in guessLetterArr
-    // because null(s) are already marked
-    if (!wordLetterArr.includes(guessLetterArr[i]) && guessLetterArr[i]) {
+    let letter = guessLetterArr[i];
+    if (wordLetterArr[i] === guessLetterArr[i]) {
+      // Already handled this case, so DO NOTHING
+    }
+    // Close
+    else if (wordLetterArr.includes(letter) && wordLetterMap[letter] > 0) {
+      letterBoxes[ANSWER_LENGTH * currentRow + i].classList.add('close');
+      wordLetterMap[letter]--;
+    }
+    // wrong
+    else {
       letterBoxes[ANSWER_LENGTH * currentRow + i].classList.add('wrong');
     }
   }
-
-  console.log(guessLetterArr);
-  console.log(wordLetterArr);
-
   // new row initiating and guessLetterArr is being reset
   currentRow++;
   guessLetterArr = [];
 }
 
 function handleCorrect() {
+  alert('You win! 🙂');
   // Adding winner class to the header
   h1.classList.add('winner');
   // Adding colors to the boxes in the row
@@ -165,6 +160,13 @@ function handleBackspace() {
 
 function isLetter(letter) {
   return /^[a-zA-Z]$/.test(letter);
+}
+
+function makeMap(arr) {
+  return arr.reduce((obj, curValue) => {
+    obj[curValue] ? obj[curValue]++ : (obj[curValue] = 1);
+    return obj;
+  }, {});
 }
 
 function hideLoadingSpiral(bool) {
