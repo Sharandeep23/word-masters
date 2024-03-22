@@ -91,27 +91,22 @@ function handleValid() {
   // Mapping for wordLetterArr to keep track of the letters
   let wordLetterMap = makeMap(wordLetterArr);
 
+  // Marking up as correct, close or wrong
+  // right word at the right position is considered as correct
   // correct
-  if (wordOfTheDay === guessWord) {
-    handleCorrect();
-    return;
-  }
-
-  // partial correct
   for (let i = 0; i < ANSWER_LENGTH; i++) {
-    // correct
     if (wordLetterArr[i] === guessLetterArr[i]) {
       letterBoxes[ANSWER_LENGTH * currentRow + i].classList.add('correct');
       wordLetterMap[guessLetterArr[i]]--;
     }
   }
-  // Close and wrong
+  // close and wrong
   for (let i = 0; i < ANSWER_LENGTH; i++) {
     let letter = guessLetterArr[i];
     if (wordLetterArr[i] === guessLetterArr[i]) {
       // Already handled this case, so DO NOTHING
     }
-    // Close
+    // close
     else if (wordLetterArr.includes(letter) && wordLetterMap[letter] > 0) {
       letterBoxes[ANSWER_LENGTH * currentRow + i].classList.add('close');
       wordLetterMap[letter]--;
@@ -122,7 +117,13 @@ function handleValid() {
     }
   }
 
-  // Game should end after round 6
+  // Win
+  if (wordOfTheDay === guessWord) {
+    handleCorrect();
+    return;
+  }
+
+  // Game should end after round 6 aka Losing
   if (currentRow + 1 === ROUNDS) {
     alert(`You lose 😟. The word is ${wordOfTheDay}`);
     document.removeEventListener('keydown', handleKeyPress);
@@ -138,15 +139,10 @@ function handleCorrect() {
   alert('You win! 🙂');
   // Adding winner class to the header
   h1.classList.add('winner');
-  // Adding colors to the boxes in the row
-  for (let i = 0; i < ANSWER_LENGTH; i++) {
-    letterBoxes[ANSWER_LENGTH * currentRow + i].classList.add('correct');
-  }
   // Removing Event Listener
   document.removeEventListener('keydown', handleKeyPress);
-
-  // Start Confetti
-  confetti();
+  // My favorite part
+  throwConfetti();
 }
 
 function handleInvalid() {
@@ -183,9 +179,10 @@ function hideLoadingSpiral(bool) {
   spiral.classList.toggle('hidden', bool);
 }
 
-// Confetti
+// Confetti implementation by 'Michael Beckius' as '@bananascript'
+// Source: 'https://codepen.io/bananascript/pen/EyZeWm'
 
-const confetti = function () {
+const throwConfetti = function () {
   // Globals
   var random = Math.random,
     cos = Math.cos,
