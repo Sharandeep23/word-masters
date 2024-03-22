@@ -119,14 +119,13 @@ function handleValid() {
 
   // Win
   if (wordOfTheDay === guessWord) {
-    handleCorrect();
+    handleWin();
     return;
   }
 
   // Game should end after round 6 aka Losing
   if (currentRow + 1 === ROUNDS) {
-    alert(`You lose 😟. The word is ${wordOfTheDay}`);
-    document.removeEventListener('keydown', handleKeyPress);
+    handleLose();
     return;
   }
 
@@ -135,14 +134,20 @@ function handleValid() {
   guessLetterArr = [];
 }
 
-function handleCorrect() {
+function handleWin() {
   alert('You win! 🙂');
   // Adding winner class to the header
   h1.classList.add('winner');
   // Removing Event Listener
   document.removeEventListener('keydown', handleKeyPress);
-  // My favorite part
+  // My favorite part 😃
   throwConfetti();
+}
+
+function handleLose() {
+  alert(`You lose 😟. The word is ${wordOfTheDay}.`);
+  // Removing Event Listener
+  document.removeEventListener('keydown', handleKeyPress);
 }
 
 function handleInvalid() {
