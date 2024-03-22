@@ -3,6 +3,7 @@ const spiral = document.querySelector('.spiral-container');
 const h1 = document.querySelector('header h1');
 
 const ANSWER_LENGTH = 5;
+const ROUNDS = 6;
 let currentRow = 0;
 let guessLetterArr = [];
 let guessWord;
@@ -43,8 +44,6 @@ function handleKeyPress(e) {
 }
 
 function handleLetter(letter) {
-  // currentRow shouldn't be higher than 5
-  if (currentRow > 5) return;
   if (guessLetterArr.length < ANSWER_LENGTH) {
     // Add letter to the end
     guessLetterArr.push(letter);
@@ -122,6 +121,14 @@ function handleValid() {
       letterBoxes[ANSWER_LENGTH * currentRow + i].classList.add('wrong');
     }
   }
+
+  // Game should end after round 6
+  if (currentRow + 1 === ROUNDS) {
+    alert(`You lose 😟. The word is ${wordOfTheDay}`);
+    document.removeEventListener('keydown', handleKeyPress);
+    return;
+  }
+
   // new row initiating and guessLetterArr is being reset
   currentRow++;
   guessLetterArr = [];
