@@ -154,7 +154,7 @@ function handleInvalid() {
   for (let i = 0; i < ANSWER_LENGTH; i++) {
     letterBoxes[ANSWER_LENGTH * currentRow + i].classList.add('invalid');
 
-    // Removing 'invalid' class after 1s
+    // Removing 'invalid' class from the letter boxes after 1s
     setTimeout(function () {
       letterBoxes[ANSWER_LENGTH * currentRow + i].classList.remove('invalid');
     }, 1000);
