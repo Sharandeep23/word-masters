@@ -107,7 +107,7 @@ function handleValid() {
       // Already handled this case, so DO NOTHING
     }
     // close
-    else if (wordLetterArr.includes(letter) && wordLetterMap[letter] > 0) {
+    else if (wordLetterArr.includes(letter) && wordLetterMap[letter]) {
       letterBoxes[ANSWER_LENGTH * currentRow + i].classList.add('close');
       wordLetterMap[letter]--;
     }
