@@ -1,5 +1,5 @@
 const letterBoxes = document.querySelectorAll('.letter-box');
-const spiral = document.querySelector('.spiral-container');
+const spiral = document.querySelector('.spiral');
 const h1 = document.querySelector('header h1');
 
 const ANSWER_LENGTH = 5;
